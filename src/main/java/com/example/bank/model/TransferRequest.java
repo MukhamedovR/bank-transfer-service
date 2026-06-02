@@ -10,7 +10,6 @@ public class TransferRequest {
     // Пустой конструктор для парсинга JSON
     public TransferRequest() {}
 
-    // Геттеры
     public String getFromAccount() { return fromAccount; }
     public String getToAccount() { return toAccount; }
     public BigDecimal getAmount() { return amount; }
