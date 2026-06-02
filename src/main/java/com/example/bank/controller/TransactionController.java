@@ -23,7 +23,6 @@ public class TransactionController {
         this.transactionRepository = transactionRepository;
     }
 
-    // 3. POST /transactions : Проведение перевода денег (Асинхронно!)
     @PostMapping
     public CompletableFuture<ResponseEntity<Map<String, String>>> makeTransfer(@RequestBody TransferRequest request) {
         // Вызываем асинхронный метод сервиса (наш аналог горутины)
@@ -32,14 +31,12 @@ public class TransactionController {
                         "transactionId", tx.getId(),
                         "status", tx.getStatus()
                 )))
-                // Если внутри CompletableFuture произошла ошибка (например, IllegalArgumentException)
                 .exceptionally(ex -> ResponseEntity.badRequest().body(Map.of(
                         "status", "failed",
                         "error", ex.getCause() != null ? ex.getCause().getMessage() : ex.getMessage()
                 )));
     }
 
-    // 4. GET /transactions/{accountId} : Получение истории транзакций
     @GetMapping("/{accountId}")
     public ResponseEntity<List<Transaction>> getHistory(@PathVariable String accountId) {
         List<Transaction> history = transactionRepository.findByFromAccountOrToAccount(accountId, accountId);
