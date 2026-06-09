@@ -1,45 +1,41 @@
 package com.example.bank.controller;
 
+import com.example.bank.dto.TransferRequest;
+import com.example.bank.dto.TransferResponse;
 import com.example.bank.model.Transaction;
-import com.example.bank.model.TransferRequest;
-import com.example.bank.repository.TransactionRepository;
+import com.example.bank.service.TransactionService;
 import com.example.bank.service.TransferService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/transactions")
 public class TransactionController {
-
     private final TransferService transferService;
-    private final TransactionRepository transactionRepository;
+    private final TransactionService transactionService;
 
-    public TransactionController(TransferService transferService, TransactionRepository transactionRepository) {
+    public TransactionController(TransferService transferService, TransactionService transactionService) {
         this.transferService = transferService;
-        this.transactionRepository = transactionRepository;
+        this.transactionService = transactionService;
     }
 
     @PostMapping
-    public CompletableFuture<ResponseEntity<Map<String, String>>> makeTransfer(@RequestBody TransferRequest request) {
-        // Вызываем асинхронный метод сервиса (наш аналог горутины)
+    public CompletableFuture<ResponseEntity<TransferResponse>> makeTransfer(@Valid @RequestBody TransferRequest request) {
         return transferService.makeTransfer(request.getFromAccount(), request.getToAccount(), request.getAmount())
-                .thenApply(tx -> ResponseEntity.ok(Map.of(
-                        "transactionId", tx.getId(),
-                        "status", tx.getStatus()
-                )))
-                .exceptionally(ex -> ResponseEntity.badRequest().body(Map.of(
-                        "status", "failed",
-                        "error", ex.getCause() != null ? ex.getCause().getMessage() : ex.getMessage()
-                )));
+                .thenApply(tx -> ResponseEntity.ok(new TransferResponse(tx.getId(), tx.getStatus())))
+                .exceptionally(ex -> {
+                    Throwable cause = ex.getCause() != null ? ex.getCause() : ex;
+                    return ResponseEntity.badRequest().body(new TransferResponse(null, "failed"));
+                });
     }
 
     @GetMapping("/{accountId}")
     public ResponseEntity<List<Transaction>> getHistory(@PathVariable String accountId) {
-        List<Transaction> history = transactionRepository.findByFromAccountOrToAccount(accountId, accountId);
+        List<Transaction> history = transactionService.getHistory(accountId);
         return ResponseEntity.ok(history);
     }
 }

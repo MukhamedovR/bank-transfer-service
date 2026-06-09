@@ -1,0 +1,33 @@
+### 1. Создание первого счета (John Doe)
+POST http://localhost:8080/accounts
+Content-Type: application/json
+
+{
+  "accountHolder": "John Doe",
+  "currency": "USD"
+}
+
+### 2. Создание второго счета (Jane Doe)
+POST http://localhost:8080/accounts
+Content-Type: application/json
+
+{
+  "accountHolder": "Jane Doe",
+  "currency": "USD"
+}
+
+### 3. Получение баланса счета (Замените ID на реальный из ответа выше)
+GET http://localhost:8080/accounts/ВСТАВЬТЕ_СЮДА_ID/balance
+
+### 4. Проведение асинхронного перевода денег
+POST http://localhost:8080/transactions
+Content-Type: application/json
+
+{
+  "fromAccount": "ВСТАВЬТЕ_СЮДА_ID_ОТПРАВИТЕЛЯ",
+  "toAccount": "ВСТАВЬТЕ_СЮДА_ID_ПОЛУЧАТЕЛЯ",
+  "amount": 100.0
+}
+
+### 5. Получение истории транзакций
+GET http://localhost:8080/transactions/ВСТАВЬТЕ_СЮДА_ID

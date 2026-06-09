@@ -1,37 +1,32 @@
 package com.example.bank.controller;
 
+import com.example.bank.dto.BalanceResponse;
+import com.example.bank.dto.CreateAccountRequest;
 import com.example.bank.model.BankAccount;
-import com.example.bank.repository.AccountRepository;
+import com.example.bank.service.AccountService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
-import java.util.UUID;
-
 @RestController
 @RequestMapping("/accounts")
 public class AccountController {
+    private final AccountService accountService;
 
-    private final AccountRepository accountRepository;
-
-    public AccountController(AccountRepository accountRepository) {
-        this.accountRepository = accountRepository;
+    public AccountController(AccountService accountService) {
+        this.accountService = accountService;
     }
 
     @PostMapping
-    public ResponseEntity<BankAccount> createAccount(@RequestBody BankAccount request) {
-        String newId = UUID.randomUUID().toString(); // Генерируем уникальный ID
-        BankAccount account = new BankAccount(newId, request.getAccountHolder(), request.getCurrency());
-        BankAccount savedAccount = accountRepository.save(account);
-        return new ResponseEntity<>(savedAccount, HttpStatus.CREATED);
+    public ResponseEntity<BankAccount> createAccount(@Valid @RequestBody CreateAccountRequest request) {
+        BankAccount account = accountService.createAccount(request.getAccountHolder(), request.getCurrency());
+        return ResponseEntity.status(HttpStatus.CREATED).body(account);
     }
 
     @GetMapping("/{id}/balance")
-    public ResponseEntity<Map<String, Object>> getBalance(@PathVariable String id) {
-        BankAccount account = accountRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Account not found"));
-
-        return ResponseEntity.ok(Map.of("balance", account.getBalance()));
+    public ResponseEntity<BalanceResponse> getBalance(@PathVariable String id) {
+        BankAccount account = accountService.getAccount(id);
+        return ResponseEntity.ok(new BalanceResponse(account.getBalance()));
     }
 }
