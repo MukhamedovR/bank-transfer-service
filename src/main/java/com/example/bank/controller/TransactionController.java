@@ -35,7 +35,6 @@ public class TransactionController {
 
     @GetMapping("/{accountId}")
     public ResponseEntity<List<Transaction>> getHistory(@PathVariable String accountId) {
-        List<Transaction> history = transactionService.getHistory(accountId);
-        return ResponseEntity.ok(history);
+        return ResponseEntity.ok(transactionService.getHistory(accountId));
     }
 }

@@ -26,7 +26,6 @@ public class AccountController {
 
     @GetMapping("/{id}/balance")
     public ResponseEntity<BalanceResponse> getBalance(@PathVariable String id) {
-        BankAccount account = accountService.getAccount(id);
-        return ResponseEntity.ok(new BalanceResponse(account.getBalance()));
+        return ResponseEntity.ok(new BalanceResponse(accountService.getBalance(id)));
     }
 }

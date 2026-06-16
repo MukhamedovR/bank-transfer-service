@@ -18,9 +18,8 @@ public class TransactionService {
     }
 
     public Transaction recordTransaction(String fromAccount, String toAccount, BigDecimal amount, String status, LocalDateTime timestamp) {
-        String id = UUID.randomUUID().toString();
-        Transaction tx = new Transaction(id, fromAccount, toAccount, amount, timestamp, status);
-        return transactionRepository.save(tx);
+        return transactionRepository.save(
+                new Transaction(UUID.randomUUID().toString(), fromAccount, toAccount, amount, timestamp, status));
     }
 
     public List<Transaction> getHistory(String accountId) {

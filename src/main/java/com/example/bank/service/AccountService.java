@@ -5,6 +5,8 @@ import com.example.bank.model.BankAccount;
 import com.example.bank.repository.AccountRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Service
@@ -24,6 +26,11 @@ public class AccountService {
 
     public BankAccount getAccount(String id) {
         return accountRepository.findById(id)
+                .orElseThrow(() -> new AccountNotFoundException("Account not found: " + id));
+    }
+
+    public BigDecimal getBalance(String id) {
+        return accountRepository.findBalanceById(id)
                 .orElseThrow(() -> new AccountNotFoundException("Account not found: " + id));
     }
 
